@@ -1,6 +1,5 @@
 package HW4_GUI;
 
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -30,16 +29,5 @@ public class BoardPanel extends JPanel {
         for (int i = 0; i < size; i++) {
             g.drawLine(i * squareSize, 0, i * squareSize, getHeight());
         }
-    }
-
-    public static void main(String[] args) {
-        Board board = new Board(15);
-        BoardPanel panel = new BoardPanel(board);
-        JFrame frame = new JFrame();
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.add(panel);
-        frame.setSize(500, 500);
-        frame.setVisible(true);
-
     }
 }
