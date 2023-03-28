@@ -1,367 +1,223 @@
 package HW4_GUI;
 
-import java.util.ArrayList;
-import java.util.List;
-
-
-
-// Complete the methods in the following code
-//  import omok.model.Player;
+import java.util.Random;
 
 /**
- * Abstraction of an Omok board, which consists of n x n intersections
- * or places where players can place their stones. The board can be 
- * accessed using a pair of 0-based indices (x, y), where x and y 
- * denote the column and row number, respectively. The top-left 
- * intersection is represented by the indices (0, 0), and the
- * bottom-right intersection is represented by the indices (n-1, n-1).
- */
+    * A class for creating a new Game Board
+    * <p>This class represents a Game Board and provides methods for initializing a board, making moves,
+    * checking if the board is full, checking if there is a winner, and getting suggestions for moves.</p>
+    * <p>The Board is represented as a 2D array of characters, with '-' representing an empty space,
+    * 'X' representing Player 1, and 'O' representing Player 2. </p>
+    * <p>Author: Diego Jared Avina</p>
+    * <p>Version: 19.0.2, 2023-01-17</p>
+*/
 public class Board {
-    private int[][] board;
-    private List<Place> winningRow;
+    /** The Game Board */
+    private char[][] board;
+    /** The size of the board */
     private int size;
-    private Player player1;
-    private Player player2;
     
-
-    /** Create a new board of the default size. */
-    public Board() {
-        this(15);
-    }
-
-    /** Create a new board of the specified size. */
-    public Board(int size) {
+    /**
+     * Constructs a new Game Board of the given size.
+     * @param size the size of the Game Board.
+    */
+    public Board(int size){
         this.size = size;
-        this.board = new int[size][size];
-        this.winningRow = new ArrayList<>();
-        this.player1 = new Player("Player 1");
-        this.player2 = new Player("Player 2");
+        this.board = new char[size][size];
     }
 
-    /** Return the size of this board. */
-    public int size() {
+    /**
+     * Initializes the board by filling the board with '-' signifying an empty space
+     */
+    public void initializeBoard(){
+        for (int i = 0; i < size; i++){
+            for (int j = 0; j < size; j++){
+                board[i][j] = '-';
+            }
+        }
+    }
+
+    /**
+     * Gets the current size of the board
+     * @return an integer that signifyies the size of the board
+     */
+    public int getSize(){
         return size;
     }
     
-    /** Removes all the stones placed on the board, effectively 
-     * resetting the board to its original state. 
+    /**
+     * Checks if the current move is valid, if it is we place the player symbol
+     * @param row - row provided by user
+     * @param col - column provided by user
+     * @param piece - symbol of current user
+     * @return boolean response depending if the move is valid or not
      */
-    public void clear() {
-        board = new int[size][size];
-        winningRow.clear();
+    public boolean makeMove(int row, int col, char piece) {
+        if (row < 0 || row >= size || col < 0 || col >= size || board[row][col] != '-') {
+            return false;
+        }
+        board[row][col] = piece;
+        return true;
     }
 
-    /** Return a boolean value indicating whether all the places
-     * on the board are occupied or not.
+    /**
+     * Returns the current piece given the row and column
+     * @param row - row given by user
+     * @param col - column given by user
+     * @return returns the current piece located at the coordinates provided
      */
-    public boolean isFull() {
-        for (int row = 0; row < size; row++){
-            for (int col = 0; col < size; col++){
-                if (board[row][col] == 0){
+    public char getPieceAt(int row, int col){
+        return board[row][col];
+    }
+
+    
+    /**
+     * Checks if current board is full
+     * @return returns false if we encounter an empty space '-', otherwise returns true
+     */
+    public boolean isFull(){
+        for (int i = 0; i < size; i++){
+            for (int j = 0; j < size; j++){
+                if (board[i][j] == '-'){
                     return false;
                 }
             }
         }
         return true;
     }
+
     
     /**
-     * Place a stone for the specified player at a specified 
-     * intersection (x, y) on the board.
-     *
-     * @param x 0-based column (vertical) index
-     * @param y 0-based row (horizontal) index
-     * @param player Player whose stone is to be placed
+     * Checks if there is a winner by checking horizantally, vertically, and diagonals
+     * @param row
+     * @param col
+     * @return returns true if we encounter 5 of the same symbols in a row, otherwise returns false
      */
-    public void placeStone(int x, int y, Player player) {
-        if (!isEmpty(x, y)){
-            throw new IllegalArgumentException("Place is already occupied");
-        }
-        // 1 represents Player 1, 2 represents Player 2
-        board[x][y] = player.name().equals(player1.name()) ? 1 : 2;
-    }
-    
-    /**
-     * Return a boolean value indicating whether the specified 
-     * intersection (x, y) on the board is empty or not.
-     *
-     * @param x 0-based column (vertical) index
-     * @param y 0-based row (horizontal) index
-     */
-    public boolean isEmpty(int x, int y) {
-        return board[x][y] == 0;
-    }
-    
-    /**
-     * Is the specified place on the board occupied?
-     *
-     * @param x 0-based column (vertical) index
-     * @param y 0-based row (horizontal) index
-     */
-    public boolean isOccupied(int x, int y) {
-        return board[x][y] != 0;
-    }
+    public boolean hasWinner(int row, int col) {
+        char piece = board[row][col];
 
-    /**
-     * Rreturn a boolean value indicating whether the specified 
-     * intersection (x, y) on the board is occupied by the given 
-     * player or not.
-     *
-     * @param x 0-based column (vertical) index
-     * @param y 0-based row (horizontal) index
-     */
-    public boolean isOccupiedBy(int x, int y, Player player) {
-        return board[x][y] == (player.name().equals(player1.name()) ? 1 : 2);
-    }
-
-    /**
-     * Return the player who occupies the specified intersection (x, y) 
-     * on the board. If the place is empty, this method returns null.
-     * 
-     * @param x 0-based column (vertical) index
-     * @param y 0-based row (horizontal) index
-     */
-    public Player playerAt(int x, int y) {
-        if (board[x][y] == 1){
-            return player1;
-        }else if (board[x][y] == 2){
-            return player2;
-        }else{
-            return null;
-        }
-    }
-
-    /** 
-     * Return a boolean value indicating whether the given player 
-     * has a winning row on the board. A winning row is a consecutive 
-     * sequence of five or more stones placed by the same player in 
-     * a horizontal, vertical, or diagonal direction.
-     */
-    public boolean isWonBy(Player player) {
+        // Check for horizontal win
         int count = 0;
-
-        // Check Horizontal Win
-        for (int y = 0; y < size; y++){
-            for (int x = 0; x < size; x++){
-                if (isOccupiedBy(x, y, player)){
-                    count++;
-
-                    if (count == 5){
-                        return true;
-                    }
-                }else{
-                    count = 0;
-
+        for (int c = 0; c < size; c++) {
+            if (board[row][c] == piece) {
+                count++;
+                if (count == 5) {
+                    return true;
                 }
+            } else {
+                count = 0;
             }
         }
 
-        // Check Vertical Win
+        // Check for vertical win
         count = 0;
-        for (int x = 0; x < size; x++){
-            for (int y = 0; y < size; y++){
-                if (isOccupiedBy(x, y, player)){
-                    count++;
-                    if (count == 5){
-                        return true;
-                    }
-                }else{
-                    count = 0;
+        for (int r = 0; r < size; r++) {
+            if (board[r][col] == piece) {
+                count++;
+                if (count == 5) {
+                    return true;
                 }
+            } else {
+                count = 0;
             }
         }
 
-        //  Check Diagonal Win (top-left to bottom-right)
+        // Check for diagonal win (top-left to bottom-right)
         count = 0;
-        for (int x = 0; x <= size - 5; x++){
-            for (int y = 0; y <= size - 5; y++){
-                for (int i = 0; i < 5; i++){
-                    if (isOccupiedBy(x+i, y+i, player)){
-                        count++;
-                        if (count == 5){
-                            return true;
-                        }
-                    }else{
-                        count = 0;
-                    }
-                }
-            }
+        int r = row;
+        int c = col;
+        while (r > 0 && c > 0 && board[r-1][c-1] == piece) {
+            r--;
+            c--;
         }
-        
+        while (r < size && c < size && board[r][c] == piece) {
+            count++;
+            r++;
+            c++;
+        }
+        if (count >= 5) {
+            return true;
+        }
 
-        // Check Diagonal Win (top-right to bottom-left)
+        // Check for diagonal win (bottom-left to top-right)
         count = 0;
-        for (int x = size - 1; x >= 4; x--){
-            for (int y = 0; y <= size - 5; y++){
-                for (int i = 0; i < 5; i++){
-                    if (isOccupiedBy(x-i, y+i, player)){
-                        count++;
-                        if (count == 5){
-                            return true;
-                        }
-                    }else{
-                        count = 0;
-                    }
-                }
-            }
+        r = row;
+        c = col;
+        while (r < size-1 && c > 0 && board[r+1][c-1] == piece) {
+            r++;
+            c--;
         }
+        while (r >= 0 && c < size && board[r][c] == piece) {
+            count++;
+            r--;
+            c++;
+        }
+        if (count >= 5) {
+            return true;
+        }
+
         return false;
     }
 
-    /** Return the winning row. For those who are not familiar with
-     * the Iterable interface, you may return an object of
-     * List<Place>. */
-    public Iterable<Place> winningRow() {
-        winningRow.clear();
-
-    // Check Horizontal Win
-    for (int y = 0; y < size; y++) {
-        for (int x = 0; x < size; x++) {
-            if (isOccupiedBy(x, y, player1)) {
-                int count = 1;
-                winningRow.add(new Place(x, y));
-                while (x + count < size && isOccupiedBy(x + count, y, player1)) {
-                    count++;
-                    winningRow.add(new Place(x + count - 1, y));
+    
+    /**
+     * Suggests a move to a Human Player if they enable cheatmode
+     * @param playerSymbol
+     * @return a coordinate containing a random move, a winning move, or a blocking move
+     */
+    public Coordinate getSuggestion(char playerSymbol) {
+        Coordinate suggestion;
+    
+        // Check for a winning move
+        for (int row = 0; row < size; row++) {
+            for (int col = 0; col < size; col++) {
+                if (board[row][col] == '-') {
+                    board[row][col] = playerSymbol;
+                    if (hasWinner(row, col)) {
+                        board[row][col] = '-';
+                        return new Coordinate(row, col);
+                    }
+                    board[row][col] = '-';
                 }
-                if (count >= 5) {
-                    return winningRow;
-                }
-                winningRow.clear();
-            }else if (isOccupiedBy(x, y, player2)) {
-                int count = 1;
-                winningRow.add(new Place(x, y));
-                while (x + count < size && isOccupiedBy(x + count, y, player2)) {
-                    count++;
-                    winningRow.add(new Place(x + count - 1, y));
-                }
-                if (count >= 5) {
-                    return winningRow;
-                }
-                winningRow.clear();
             }
         }
-    }
-
-    // Check Vertical Win
-    for (int x = 0; x < size; x++) {
-        for (int y = 0; y < size; y++) {
-            if (isOccupiedBy(x, y, player1)) {
-                int count = 1;
-                winningRow.add(new Place(x, y));
-                while (y + count < size && isOccupiedBy(x, y + count, player1)) {
-                    count++;
-                    winningRow.add(new Place(x, y + count - 1));
+    
+        // Check for a blocking move
+        char opponentSymbol = (playerSymbol == 'X') ? 'O' : 'X';
+        for (int row = 0; row < size; row++) {
+            for (int col = 0; col < size; col++) {
+                if (board[row][col] == '-') {
+                    board[row][col] = opponentSymbol;
+                    if (hasWinner(row, col)) {
+                        board[row][col] = '-';
+                        return new Coordinate(row, col);
+                    }
+                    board[row][col] = '-';
                 }
-                if (count >= 5) {
-                    return winningRow;
-                }
-                winningRow.clear();
-            }else if (isOccupiedBy(x, y, player2)) {
-                int count = 1;
-                winningRow.add(new Place(x, y));
-                while (y + count < size && isOccupiedBy(x, y + count, player2)) {
-                    count++;
-                    winningRow.add(new Place(x, y + count - 1));
-                }
-                if (count >= 5) {
-                    return winningRow;
-                }
-                winningRow.clear();
             }
         }
+    
+        // If there is no winning or blocking move, suggest a random move
+        Random rand = new Random();
+        do {
+            suggestion = new Coordinate(rand.nextInt(size), rand.nextInt(size));
+        } while (!isCellEmpty(suggestion.getX(), suggestion.getY()));
+    
+        return suggestion;
     }
-
-    //  Check Diagonal Win (top-left to bottom-right)
-    for (int x = 0; x <= size - 5; x++) {
-        for (int y = 0; y <= size - 5; y++) {
-            if (isOccupiedBy(x, y, player1)) {
-                int count = 1;
-                winningRow.add(new Place(x, y));
-                while (x + count < size && y + count < size && isOccupiedBy(x + count, y + count, player1)) {
-                    count++;
-                    winningRow.add(new Place(x + count - 1, y + count - 1));
-                }
-                if (count >= 5) {
-                    return winningRow;
-                }
-                winningRow.clear();
-            }else if (isOccupiedBy(x, y, player2)) {
-                int count = 1;
-                winningRow.add(new Place(x, y));
-                while (x + count < size && y + count < size && isOccupiedBy(x + count, y + count, player2)) {
-                    count++;
-                    winningRow.add(new Place(x + count - 1, y + count - 1));
-                }
-                if (count >= 5) {
-                    return winningRow;
-                }
-                winningRow.clear();
-            }
-        }
-    }
-
-    // Check Diagonal Win (top-right to bottom-left)
-    for (int x = size - 1; x >= 4; x--) {
-        for (int y = 0; y <= size - 5; y++) {
-            if (isOccupiedBy(x, y, player1)) {
-                int count = 1;
-                winningRow.add(new Place(y, x));
-                while (x - count >= 0 && y + count < size && isOccupiedBy(x - count, y + count, player1)) {
-                    count++;
-                    winningRow.add(new Place(y+count - 1,x - count + 1));
-                }
-                if (count >= 5) {
-                    return winningRow;
-                }
-                winningRow.clear();
-            }else if (isOccupiedBy(x, y, player2)) {
-                int count = 1;
-                winningRow.add(new Place(x, y));
-                while (x - count >= 0 && y + count < size && isOccupiedBy(x - count, y + count, player2)) {
-                    count++;
-                    winningRow.add(new Place(y+count - 1,x - count + 1));
-                }
-                if (count >= 5) {
-                    return winningRow;
-                }
-                winningRow.clear();
-            }
-        }
-    }
-
-    return winningRow;
-
-    }
+    
+    
+    
 
     /**
-     * An intersection on an Omok board identified by its 0-based column
-     * index (x) and row index (y). The indices determine the position 
-     * of a place on the board, with (0, 0) denoting the top-left 
-     * corner and (n-1, n-1) denoting the bottom-right corner, 
-     * where n is the size of the board.
+     * Checks if the board at the coordinates provided contains an empty space: '-'
+     * @param row
+     * @param col
+     * @return returns true if the we encounter an empty space: '-', otherwise false
      */
-    public static class Place {
-        /** 0-based column index of this place. */
-        public final int x;
-
-        /** 0-based row index of this place. */
-        public final int y;
-
-        /** Create a new place of the given indices. 
-         * 
-         * @param x 0-based column (vertical) index
-         * @param y 0-based row (horizontal) index
-         */
-        public Place(int x, int y) {
-            this.x = x;
-            this.y = y;
-        }
-
-        // other methods if needed ...
-        @Override
-        public String toString() {
-            return "(" + x + "," + y + ")";
-        }
+    public boolean isCellEmpty(int row, int col){
+        return board[row][col] == '-';
     }
+
+
 }

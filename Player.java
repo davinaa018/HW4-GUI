@@ -1,24 +1,22 @@
 package HW4_GUI;
 
-/**
- * A player in an Omok game. It holds the name of the player and
- * can be used to identify a specific player throughout the game. 
- * The Player class helps to keep track of the moves made by each 
- * player during the game.
- */
-public class Player {
 
-    /** Name of this player. */
-    private final String name;
+public abstract class Player {
+    protected String name;
+    protected char symbol;
 
-    /** Create a new player with the given name. */
-    public Player(String name) {
+    public Player(String name, char symbol){
         this.name = name;
+        this.symbol = symbol;
     }
 
-    /** Return the name of this player. */
-    public String name() {
+    public String getName(){
         return name;
     }
-}
 
+    public char getSymbol(){
+        return symbol;
+    }
+
+    public abstract Coordinate pickPlace(Board board);
+}
