@@ -1,4 +1,4 @@
-package HW4_GUI;
+package HW4_GUI.console;
 
 import java.util.Random;
 

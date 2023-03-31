@@ -3,6 +3,13 @@ package HW4_GUI;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+
+import HW4_GUI.console.Board;
+import HW4_GUI.console.ComputerPlayer;
+import HW4_GUI.console.Coordinate;
+import HW4_GUI.console.HumanPlayer;
+import HW4_GUI.console.Player;
+
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.MouseAdapter;
@@ -16,7 +23,7 @@ public class BoardPanel extends JPanel {
     private Coordinate hoverIntersection;
     private Board board;
     private Player player1;
-    private Player player2;
+    private Player opponent;
     private Player currentPlayer;
 
 
@@ -24,7 +31,7 @@ public class BoardPanel extends JPanel {
         this.board = board;
         turnLabel = new JLabel();
         this.player1 = new HumanPlayer("Player1", 'X',null);
-        this.player2 = new HumanPlayer("Player2", 'O',null);
+        this.opponent = new HumanPlayer("Player2", 'O',null);
         this.currentPlayer = player1;
         setBackground(boardColor);
         // Place stones on the board
@@ -34,13 +41,42 @@ public class BoardPanel extends JPanel {
         
     }
 
+    public Player getCurrentPlayer(){
+        return currentPlayer;
+    }
+
+    public void setCurrentPlayer(Player player){
+       this.currentPlayer = player;  
+    }
+
+    public Player getPlayer1(){
+        return player1;
+    }
+
+    public void setPlayer1(Player player1){
+        this.player1 = player1;
+    }
+
+    public Player getOpponent(){
+        return opponent;
+    }
+
+    public void setOpponent(Player opponent){
+        this.opponent = null;
+        this.opponent = opponent;
+    }
+
+
     public JLabel getJLabel(){
         return turnLabel;
     }
 
-    public JLabel setLabel(String text){
+    public void setLabel(String text){
         turnLabel.setText(text);
-        return turnLabel;
+    }
+
+    public void initializeBoard(){
+        board.initializeBoard();
     }
 
     @Override
@@ -48,17 +84,32 @@ public class BoardPanel extends JPanel {
         super.paintComponent(g);
         int size = board.getSize();
         int squareSize = getWidth() / size;
+        // Draw board
+        drawBoard(size, squareSize, g);
+        // Draw stones
+        drawStones(size, squareSize, g);
+        // Hovering effect
+        drawHoverEffect(size, squareSize, g);
+        if(currentPlayer == player1){
+            turnLabel.setText("Black's turn");
+        }else{
+            turnLabel.setText("White's turn");
+        }
+    }
 
-        // Draw horizontal lines
-        for (int i = 0; i < size; i++) {
-            g.drawLine(0, i * squareSize, getWidth(), i * squareSize);
+    private void drawBoard(int size, int squareSize, Graphics g){
+         // Draw horizontal lines
+         for (int i = 0; i < size; i++) {
+            g.drawLine(0, i * squareSize, getWidth(), i * squareSize );
         }
 
         // Draw vertical lines
         for (int i = 0; i < size; i++) {
             g.drawLine(i * squareSize, 0, i * squareSize, getHeight());
         }
+    }
 
+    private void drawStones(int size, int squareSize, Graphics g){
         //  Draw Stones
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
@@ -67,26 +118,22 @@ public class BoardPanel extends JPanel {
                 if (board.getPieceAt(i, j) == player1.getSymbol()) {
                     g.setColor(Color.BLACK);
                     g.fillOval(x+8, y+8, squareSize / 2, squareSize / 2);
-                } else if(board.getPieceAt(i, j) == player2.getSymbol() ){
+                } else if (board.getPieceAt(i, j) == getOpponent().getSymbol()) {
                     g.setColor(Color.WHITE);
                     g.fillOval(x+8, y+8, squareSize / 2, squareSize / 2);
                     g.setColor(Color.BLACK);
                 }
+                
             }
         }
-        
-        // Hovering effect
+    }
+
+    private void drawHoverEffect(int size, int squareSize, Graphics g){
         if (hoverIntersection != null) {
             int x = hoverIntersection.getX() * squareSize + squareSize-7;
             int y = hoverIntersection.getY() * squareSize + squareSize-7;
             int ovalSize = squareSize / 2;
             g.drawOval(x, y, ovalSize, ovalSize);
-        }
-
-        if(currentPlayer == player1){
-            turnLabel.setText("Black's turn");
-        }else{
-            turnLabel.setText("White's turn");
         }
     }
 
@@ -97,15 +144,32 @@ public class BoardPanel extends JPanel {
         }
     }
 
+    private void checkDraw(){
+        if(board.isFull()){
+            JOptionPane.showMessageDialog(null, "Draw!");
+            System.exit(0);
+        }
+    }
+
+    private void computerMove(){
+        Coordinate computerMove = getOpponent().pickPlace(board);
+        board.makeMove(computerMove.getX(), computerMove.getY(), getOpponent().getSymbol());
+        repaint();
+        checkWinner(computerMove.getX(), computerMove.getY(), getOpponent());
+        checkDraw();
+        switchPlayer();
+
+    }
+
     private void switchPlayer(){
-        currentPlayer = currentPlayer == player1 ? player2 : player1;
+        currentPlayer = currentPlayer == player1 ? getOpponent() : player1;
     }
 
 
     public void placeStone(boolean startGame) {
         if(startGame){
             // Place stones on the board
-            addMouseListener(new MouseAdapter() {
+        addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     int i = e.getX() / (getWidth() / board.getSize());
@@ -113,17 +177,20 @@ public class BoardPanel extends JPanel {
                     if (i >= 0 && i < board.getSize() && j >= 0 && j < board.getSize()) {
                         if (board.getPieceAt(i, j) == '-') {
                             // place stone and switch player
-                            board.makeMove(i, j, currentPlayer.getSymbol());
-                            // repaint board
-                            repaint();
-                            checkWinner(i, j, currentPlayer);
-                            switchPlayer();
+                            if(currentPlayer instanceof HumanPlayer){
+                                board.makeMove(i, j, currentPlayer.getSymbol()); 
+                                repaint();
+                                checkWinner(i, j, currentPlayer);
+                                checkDraw();
+                                switchPlayer();
+                                if (currentPlayer instanceof ComputerPlayer){
+                                    computerMove();  
+                                }
+                            }
                         }
                     }
                 }
             });
-
-
         }
     }
 

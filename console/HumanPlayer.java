@@ -1,5 +1,4 @@
-package HW4_GUI;
-
+package HW4_GUI.console;
 
 public class HumanPlayer extends Player {
     private ConsoleUI ui;

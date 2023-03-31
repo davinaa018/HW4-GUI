@@ -1,4 +1,4 @@
-package HW4_GUI;
+package HW4_GUI.console;
 
 /**
  * The Coordinate class represents a point in 2D space with integer x and y coordinates.

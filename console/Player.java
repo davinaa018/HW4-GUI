@@ -1,5 +1,4 @@
-package HW4_GUI;
-
+package HW4_GUI.console;
 
 public abstract class Player {
     protected String name;
