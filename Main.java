@@ -36,13 +36,20 @@ public class Main extends JFrame {
         setSize(420, 500);
         setVisible(true);
     }
-
+    
+    /**
+     * Configures UI for the Omok game
+     */
     private void configureUI(){
         setLayout(new BorderLayout());
         add(createNorthPanel(), BorderLayout.NORTH);
         add(boardPanel, BorderLayout.CENTER);
     }
 
+    /**
+     * Creates the north panel
+     * @return northPanel
+     */
     private JPanel createNorthPanel() {
         JPanel northPanel = new JPanel(new BorderLayout());
         createMenu();
@@ -52,6 +59,9 @@ public class Main extends JFrame {
         return northPanel;
     }
 
+    /**
+     * Creates the menu with menu items
+     */
     private void createMenu(){
         JMenuBar menuBar = new JMenuBar();
         JMenu menu = new JMenu("Game");
@@ -78,6 +88,10 @@ public class Main extends JFrame {
         setJMenuBar(menuBar);
     }
 
+    /**
+     * Creates the toolbar
+     * @return toolbar panel
+     */
     private JPanel createToolBar(){
         JPanel panel = new JPanel();
         JToolBar toolBar = new JToolBar();
@@ -98,6 +112,10 @@ public class Main extends JFrame {
         return panel;
     }
 
+    /**
+     * Creates the combo box
+     * @return combo box panel
+     */
     private JPanel createComboBox(){
         JPanel panel = new JPanel();
         JButton playButton = new JButton(new OmokAction("Play", null, 
@@ -113,6 +131,9 @@ public class Main extends JFrame {
         return panel;
     }
 
+    /**
+     * Starts a new game if the user clicks the "Play" button or menu item, also sets the opponent type to human or computer
+     */
     private void startGame(){
         int result = JOptionPane.showConfirmDialog(null, "Do you want to start a new game?", "Omok", JOptionPane.YES_NO_OPTION);
         if(result == JOptionPane.YES_OPTION){
@@ -130,6 +151,9 @@ public class Main extends JFrame {
        
     }
 
+    /**
+     * Exits the game if the user clicks the "Exit" button or menu item
+     */
     private void exitGame() {
         int result = JOptionPane.showConfirmDialog(null, "Do you want to exit the game?", "Omok", JOptionPane.YES_NO_OPTION);
         if(result == JOptionPane.YES_OPTION){

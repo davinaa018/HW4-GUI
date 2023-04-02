@@ -16,7 +16,6 @@ public class Board {
     private char[][] board;
     /** The size of the board */
     private int size;
-    
     /**
      * Constructs a new Game Board of the given size.
      * @param size the size of the Game Board.

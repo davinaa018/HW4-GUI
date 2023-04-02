@@ -41,40 +41,75 @@ public class BoardPanel extends JPanel {
         
     }
 
+    /**
+     * Gets the current player
+     * @return currentPlayer
+     */
     public Player getCurrentPlayer(){
         return currentPlayer;
     }
 
+    /**
+     * Sets the current player
+     * @param player
+     */
     public void setCurrentPlayer(Player player){
        this.currentPlayer = player;  
     }
 
+    /**
+     * Gets the player1
+     * @return player1
+     */
     public Player getPlayer1(){
         return player1;
     }
 
+    /**
+     * Sets the player1
+     * @param player1
+     */
     public void setPlayer1(Player player1){
         this.player1 = player1;
     }
 
+    /**
+     * Gets the opponent
+     * @return opponent
+     */
     public Player getOpponent(){
         return opponent;
     }
 
+    /**
+     * Sets the opponent
+     * @param opponent
+     */
     public void setOpponent(Player opponent){
         this.opponent = null;
         this.opponent = opponent;
     }
 
 
+    /**
+     * Gets the label
+     * @return turnLabel
+     */
     public JLabel getJLabel(){
         return turnLabel;
     }
 
+    /**
+     * Sets the label
+     * @param label
+     */
     public void setLabel(String text){
         turnLabel.setText(text);
     }
 
+    /**
+     * Initializes the board
+     */
     public void initializeBoard(){
         board.initializeBoard();
     }
@@ -97,6 +132,12 @@ public class BoardPanel extends JPanel {
         }
     }
 
+    /**
+     * Draws the board
+     * @param size
+     * @param squareSize
+     * @param g
+     */
     private void drawBoard(int size, int squareSize, Graphics g){
          // Draw horizontal lines
          for (int i = 0; i < size; i++) {
@@ -109,6 +150,12 @@ public class BoardPanel extends JPanel {
         }
     }
 
+    /**
+     * Draws the stones
+     * @param size
+     * @param squareSize
+     * @param g
+     */
     private void drawStones(int size, int squareSize, Graphics g){
         //  Draw Stones
         for (int i = 0; i < size; i++) {
@@ -118,16 +165,30 @@ public class BoardPanel extends JPanel {
                 if (board.getPieceAt(i, j) == player1.getSymbol()) {
                     g.setColor(Color.BLACK);
                     g.fillOval(x+8, y+8, squareSize / 2, squareSize / 2);
+                    if (board.hasWinner(i, j)) {
+                        g.setColor(Color.RED);
+                        g.fillOval(x+10, y+10, squareSize / 2 - 4, squareSize / 2 - 4);
+                    }
                 } else if (board.getPieceAt(i, j) == getOpponent().getSymbol()) {
                     g.setColor(Color.WHITE);
                     g.fillOval(x+8, y+8, squareSize / 2, squareSize / 2);
                     g.setColor(Color.BLACK);
+                    if (board.hasWinner(i, j)) {
+                        g.setColor(Color.RED);
+                        g.fillOval(x+10, y+10, squareSize / 2 - 4, squareSize / 2 - 4);
+                    }
                 }
                 
             }
         }
     }
 
+    /**
+     * Draws the hovering effect
+     * @param size
+     * @param squareSize
+     * @param g
+     */
     private void drawHoverEffect(int size, int squareSize, Graphics g){
         if (hoverIntersection != null) {
             int x = hoverIntersection.getX() * squareSize + squareSize-7;
@@ -137,6 +198,12 @@ public class BoardPanel extends JPanel {
         }
     }
 
+    /**
+     * Checks if there is a winner, if so, it displays a message and exits the game
+     * @param i
+     * @param j
+     * @param currentPlayer
+     */
     private void checkWinner(int i, int j, Player currentPlayer){
         if(board.hasWinner(i, j)){
             JOptionPane.showMessageDialog(null, currentPlayer.getName() + " wins!");
@@ -144,6 +211,9 @@ public class BoardPanel extends JPanel {
         }
     }
 
+    /**
+     * Checks if the board is full, if so, it displays a message and exits the game
+     */
     private void checkDraw(){
         if(board.isFull()){
             JOptionPane.showMessageDialog(null, "Draw!");
@@ -151,6 +221,9 @@ public class BoardPanel extends JPanel {
         }
     }
 
+    /**
+     * Makes a move for the computer
+     */
     private void computerMove(){
         Coordinate computerMove = getOpponent().pickPlace(board);
         board.makeMove(computerMove.getX(), computerMove.getY(), getOpponent().getSymbol());
@@ -161,11 +234,18 @@ public class BoardPanel extends JPanel {
 
     }
 
+    /**
+     * Switches the player
+     */
     private void switchPlayer(){
         currentPlayer = currentPlayer == player1 ? getOpponent() : player1;
     }
 
 
+    /**
+     * Places a stone on the board by using MouseListener
+     * @param startGame
+     */
     public void placeStone(boolean startGame) {
         if(startGame){
             // Place stones on the board
@@ -194,6 +274,10 @@ public class BoardPanel extends JPanel {
         }
     }
 
+    /**
+     * Adds a hovering effect to the board
+     * @param startGame
+     */
     public void hoveringEffect(boolean startGame){
         if(startGame){
             // Hovering effect
